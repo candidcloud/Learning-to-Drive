@@ -37,11 +37,11 @@ class Environment:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("Go Q-Racer, go Q-Racer, go!")
-        display_width = 1280
-        display_height = 720
-        self.screen = pygame.display.set_mode((display_width, display_height))
+        self.display_width = 1280
+        self.display_height = 720
+        self.screen = pygame.display.set_mode((self.display_width, self.display_height))
         self.clock = pygame.time.Clock()
-        self.ticks = 60 # frames per second. Might need to adjust depending on how long calculations take
+        self.ticks = 60 # frames per second. Or iterations of the while loop per second. Might need to adjust depending on how long calculations take
         self.exit = False # flag for overall game loop
 
     colors = {'black': (0,0,0), 'white':(255,255,255), 'red':(255,0,0), 'green':(0,255,0), 'asphalt':(160,160,160)}
@@ -50,18 +50,28 @@ class Environment:
         pygame.draw()
 
     def run(self):
+        # Define colors in RGB format
+        BLACK =     (0,0,0)         #
+        WHITE =     (255,255,255)   #
+        RED =       (255,0,0)       # car color when hit wall?
+        GREEN =     (76,153,0)      # grass
+        ASPHALT =   (160,160,160)   # track
+
+        # find and load car picture in current directory
         current_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(current_dir, "car25.png")
         car_image = pygame.image.load(image_path)
-        car = Car(0, 0) #initializes car at top right of screen
-        ppu = 32 # pixel per unit ratio
+        ppu = 8 # pixel per unit ratio
+        car = Car(self.display_width//2//ppu, self.display_height//5//ppu) #initializes car sprite
+        # track = self.get_track()
+
 
         while not self.exit:
             dt = self.clock.get_time() / 1000
 
             # Event queue
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT: # if user clicks 'close'
                     self.exit = True
 
             # User input
@@ -102,11 +112,11 @@ class Environment:
             car.update(dt)
 
             # Drawing
-            self.screen.fill((0, 0, 0))
+            self.screen.fill(GREEN)
             rotated = pygame.transform.rotate(car_image, car.angle)
             rect = rotated.get_rect()
             self.screen.blit(rotated, car.position * ppu - (rect.width / 2, rect.height / 2))
-            pygame.display.flip()
+            pygame.display.update() #draws contents on screen
 
             self.clock.tick(self.ticks)
         pygame.quit()
