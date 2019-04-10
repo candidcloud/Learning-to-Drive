@@ -53,7 +53,7 @@ class Environment:
         # Define colors in RGB format
         BLACK =     (0,0,0)         #
         WHITE =     (255,255,255)   #
-        RED =       (255,0,0)       # car color when hit wall?
+        RED =       (255,0,0)       # car color when wall is hit?
         GREEN =     (76,153,0)      # grass
         ASPHALT =   (160,160,160)   # track
 
