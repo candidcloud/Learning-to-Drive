@@ -5,7 +5,7 @@ from pygame.math import Vector2
 
 
 class Car:
-    def __init__(self, x, y, angle=0.0, length=4, max_steering=30, max_acceleration=5.0):
+    def __init__(self, x, y, angle=0.0, length=2, max_steering=30, max_acceleration=5.0):
         self.position = Vector2(x, y)
         self.velocity = Vector2(0.0, 0.0)
         self.angle = angle
@@ -13,7 +13,7 @@ class Car:
         self.max_acceleration = max_acceleration
         self.max_steering = max_steering
         self.max_velocity = 20
-        self.brake_deceleration = 10
+        self.brake_deceleration = 25
         self.free_deceleration = 5
 
         self.acceleration = 0.0
@@ -37,19 +37,24 @@ class Environment:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("Go Q-Racer, go Q-Racer, go!")
-        width = 1280
-        height = 720
-        self.screen = pygame.display.set_mode((width, height))
+        display_width = 1280
+        display_height = 720
+        self.screen = pygame.display.set_mode((display_width, display_height))
         self.clock = pygame.time.Clock()
-        self.ticks = 60
-        self.exit = False
+        self.ticks = 60 # frames per second. Might need to adjust depending on how long calculations take
+        self.exit = False # flag for overall game loop
+
+    colors = {'black': (0,0,0), 'white':(255,255,255), 'red':(255,0,0), 'green':(0,255,0), 'asphalt':(160,160,160)}
+
+    def get_track(self):
+        pygame.draw()
 
     def run(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, "car.png")
+        image_path = os.path.join(current_dir, "car25.png")
         car_image = pygame.image.load(image_path)
-        car = Car(0, 0)
-        ppu = 32
+        car = Car(0, 0) #initializes car at top right of screen
+        ppu = 32 # pixel per unit ratio
 
         while not self.exit:
             dt = self.clock.get_time() / 1000
@@ -66,12 +71,12 @@ class Environment:
                 if car.velocity.x < 0:
                     car.acceleration = car.brake_deceleration
                 else:
-                    car.acceleration += 1 * dt
+                    car.acceleration += 3 * dt
             elif pressed[pygame.K_DOWN]:
                 if car.velocity.x > 0:
                     car.acceleration = -car.brake_deceleration
                 else:
-                    car.acceleration -= 1 * dt
+                    car.acceleration -= 3 * dt
             elif pressed[pygame.K_SPACE]:
                 if abs(car.velocity.x) > dt * car.brake_deceleration:
                     car.acceleration = -copysign(car.brake_deceleration, car.velocity.x)
@@ -86,9 +91,9 @@ class Environment:
             car.acceleration = max(-car.max_acceleration, min(car.acceleration, car.max_acceleration))
 
             if pressed[pygame.K_RIGHT]:
-                car.steering -= 30 * dt
+                car.steering -= 50 * dt
             elif pressed[pygame.K_LEFT]:
-                car.steering += 30 * dt
+                car.steering += 50 * dt
             else:
                 car.steering = 0
             car.steering = max(-car.max_steering, min(car.steering, car.max_steering))
@@ -105,6 +110,7 @@ class Environment:
 
             self.clock.tick(self.ticks)
         pygame.quit()
+
 
 
 if __name__ == '__main__':
