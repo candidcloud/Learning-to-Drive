@@ -112,7 +112,7 @@ class Environment:
             car.update(dt)
 
             # Drawing
-            self.screen.fill(GREEN)
+            self.screen.fill(WHITE)
             rotated = pygame.transform.rotate(car_image, car.angle)
             rect = rotated.get_rect()
             self.screen.blit(rotated, car.position * ppu - (rect.width / 2, rect.height / 2))
