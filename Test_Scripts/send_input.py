@@ -4,6 +4,7 @@ This is meant to be tested while a game is open.
 """
 
 import pyautogui
+import time
 
 # Countdown to key being pressed
 for i in list(range(5))[::-1]:
