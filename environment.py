@@ -44,7 +44,6 @@ class Environment:
         self.ticks = 60 # frames per second. Or iterations of the while loop per second. Might need to adjust depending on how long calculations take
         self.exit = False # flag for overall game loop
 
-    colors = {'black': (0,0,0), 'white':(255,255,255), 'red':(255,0,0), 'green':(0,255,0), 'asphalt':(160,160,160)}
 
     def get_track(self):
         pygame.draw()
@@ -112,7 +111,7 @@ class Environment:
             car.update(dt)
 
             # Drawing
-            self.screen.fill(WHITE)
+            self.screen.fill(GREEN)
             rotated = pygame.transform.rotate(car_image, car.angle)
             rect = rotated.get_rect()
             self.screen.blit(rotated, car.position * ppu - (rect.width / 2, rect.height / 2))
