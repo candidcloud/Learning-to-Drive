@@ -1,3 +1,8 @@
+"""
+A script which demonstrates how to locate the car image and draw a rectangle
+around the supposed location on a continually updating screen.
+"""
+
 import cv2
 from PIL import ImageGrab
 import numpy as np
