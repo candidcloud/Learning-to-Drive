@@ -87,7 +87,7 @@ class Game():
         self.player_color = (255,0,255)
         self.start_game(grid_size, path_radius)
         self.board[0][self.player_pos[0], self.player_pos[1]] = self.player_color
-        self.show_board()
+        #self.show_board()
         plt.title("The Gobble Game")
 
     def start_game(self, grid_size, path_radius):
@@ -104,27 +104,31 @@ class Game():
         plt.imshow(self.board[0])
         plt.show(block=False)
 
-    def update_board(self, new_pos):
+    def update_board(self, new_pos, show_plt=False):
         """
         Performs the board update using a desired action (in the form of a
         destination square). Also checks if the game is over. If so, prompts
         the user to end or continue with a new game.
         """
-        self.board[0][self.player_pos] = (0,0,0)
-        if self.board[0][new_pos] is (255,255,255):
-            self.score += 1
+        if self.board[0][new_pos].sum() == 765:
+            self.score += 10
         else:
             self.score -= 1
+        self.board[0][self.player_pos] = (0,0,0)
         self.board[0][new_pos] = self.player_color
         self.player_pos = new_pos
-        self.show_board()
+        if show_plt:
+            self.show_board()
 
         if self.check_end():
-            print(f"Congratulations: Your score is {self.score}.")
-            new_game = str(input("Play Again? (y/n)"))
-            if new_game == 'y':
-                self.start_game(self.board[1],self.board[2])
-                self.show_board()
+            #print(f"Congratulations: Your score is {self.score}.")
+            #new_game = str(input("Play Again? (y/n)"))
+            #if new_game == 'y':
+            #    self.start_game(self.board[1],self.board[2])
+            #    self.show_board()
+            self.start_game(self.board[1],self.board[2])
+            return True
+        return False
 
     def get_actions(self):
         """
@@ -155,6 +159,6 @@ class Game():
         """
         Illustrates how to play the game.
         """
-        while g.check_end() == False:
+        while not end:
             plt.pause(0.25)
-            g.update_board(random.choice(g.get_actions()))
+            end = self.update_board(random.choice(self.get_actions()), True)
