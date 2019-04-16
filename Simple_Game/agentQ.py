@@ -1,8 +1,7 @@
 import gobble
 import random
 import matplotlib.pyplot as plt
-
-plt.ion()
+from tqdm import tqdm
 
 class Agent():
     def __init__(self, Q = {}, policy = 0.5, lr = 0.5, discount = 0.2):
@@ -53,7 +52,7 @@ class Agent():
 
     def play(self,epochs):
         rewards = []
-        for i in range(epochs):
+        for i in tqdm(range(epochs)):
             end = False
             while not end:
                 choice = self.get_action()
