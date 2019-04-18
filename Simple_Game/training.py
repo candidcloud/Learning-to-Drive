@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-agent = agentQ.Agent(policy = 0.5, lr = 0.25, discount = 0.8)
+agent = agentQ.Agent(policy = 0.5, lr = 0.2, discount = 1)
 print("Created Agent")
 y = []
 session_epochs = 1000
@@ -35,10 +35,12 @@ y = np.array(y)
 
 fig,ax = plt.subplots(figsize=(15,12))
 ax.plot(y)
-ax.set_title("Training Session", fontsize=20)
-ax.axvline(x=session_epochs, color='r')
-ax.axvline(x=session_epochs*2, color='r')
-ax.axvline(x=session_epochs*3, color='r')
+ax.set_title(f"Training Session (policy={agent.policy}, $\alpha$={agent.lr},
+             $\gamma$={agent.discount})", fontsize=20)
+ax.axvline(session_epochs, color='r')
+ax.axvline(session_epochs*2, color='r')
+ax.axvline(session_epochs*3, color='r')
+ax.axhline(y.mean(), color='r', linestyle='-.')
 ax.tick_params(labelsize=16)
 ax.set_xlabel('Epochs', fontsize=18)
 ax.set_ylabel('Cumulative Reward', fontsize=18)

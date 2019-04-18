@@ -83,11 +83,11 @@ class Game():
     game is played.
     """
     def __init__(self, grid_size, path_radius):
-        self.score = 0
+        """
+        Initializes the player color and a game board.
+        """
         self.player_color = (255,0,255)
         self.start_game(grid_size, path_radius)
-        self.board[0][self.player_pos[0], self.player_pos[1]] = self.player_color
-        #self.show_board()
         plt.title("The Gobble Game")
 
     def start_game(self, grid_size, path_radius):
@@ -96,6 +96,8 @@ class Game():
         """
         self.board = [draw_board(grid_size, path_radius), grid_size, path_radius]
         self.player_pos = (8,5)
+        self.score = 0
+        self.board[0][self.player_pos[0], self.player_pos[1]] = self.player_color
 
     def show_board(self):
         """
@@ -104,31 +106,18 @@ class Game():
         plt.imshow(self.board[0])
         plt.show(block=False)
 
-    def update_board(self, new_pos, show_plt=False):
+    def update_board(self, new_pos):
         """
         Performs the board update using a desired action (in the form of a
-        destination square). Also checks if the game is over. If so, prompts
-        the user to end or continue with a new game.
+        destination square).
         """
         if self.board[0][new_pos].sum() == 765:
-            self.score += 10
+            self.score += 1
         else:
             self.score -= 1
         self.board[0][self.player_pos] = (0,0,0)
         self.board[0][new_pos] = self.player_color
         self.player_pos = new_pos
-        if show_plt:
-            self.show_board()
-
-        if self.check_end():
-            #print(f"Congratulations: Your score is {self.score}.")
-            #new_game = str(input("Play Again? (y/n)"))
-            #if new_game == 'y':
-            #    self.start_game(self.board[1],self.board[2])
-            #    self.show_board()
-            self.start_game(self.board[1],self.board[2])
-            return True
-        return False
 
     def get_actions(self):
         """
@@ -136,7 +125,8 @@ class Game():
         """
         x,y = self.player_pos
         actions = [(x+1,y), (x+1,y+1), (x,y+1),
-                   (x-1,y), (x-1,y-1), (x,y-1)]
+                   (x-1,y), (x-1,y-1), (x,y-1),
+                   (x+1,y-1), (x-1,y+1)]
         valid = []
         for a in actions:
             try:
@@ -159,6 +149,8 @@ class Game():
         """
         Illustrates how to play the game.
         """
+        end = False
         while not end:
             plt.pause(0.25)
-            end = self.update_board(random.choice(self.get_actions()), True)
+            self.update_board(random.choice(self.get_actions()), True)
+            end = self.check_end()

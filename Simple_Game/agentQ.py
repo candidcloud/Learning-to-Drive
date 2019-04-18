@@ -34,7 +34,8 @@ class Agent():
     def evolve(self, choice, show_plt=False):
         old_pos = self.game.player_pos
         old_score = self.game.score
-        end = self.game.update_board(choice, show_plt)
+        self.game.update_board(choice)
+        end = self.game.check_end()
         return old_pos, old_score, end
 
     def get_reward(self, old_score):
@@ -51,22 +52,25 @@ class Agent():
             self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R
 
     def play(self,epochs):
-        rewards = []
+        scores = []
         for i in tqdm(range(epochs)):
             end = False
+            self.game.start_game(self.game.board[1],self.game.board[2])
             while not end:
                 choice = self.get_action()
                 old_pos, old_score, end = self.evolve(choice)
                 R = self.get_reward(old_score)
                 self.learn(old_pos, R, choice)
-            rewards.append(self.reward)
+            scores.append(self.game.score)
             self.reward = 0
-        return rewards
+        return scores
 
     def play_slow(self):
         end = False
+        self.game.start_game(self.game.board[1],self.game.board[2])
         while not end:
-            plt.pause(0.005)
+            self.game.show_board()
+            plt.pause(0.05)
             choice = self.get_action()
             old_pos, old_score, end = self.evolve(choice, True)
             R = self.get_reward(old_score)
