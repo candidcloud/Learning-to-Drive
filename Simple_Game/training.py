@@ -1,3 +1,8 @@
+"""
+A script for implementing Q-learning with agentQ.py and plotting the results
+of decreasing policy values over time.
+"""
+
 import agentQ
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,8 +37,6 @@ ax[0].grid()
 
 #-----------------------------------------------------------------------
 
-#agent = agentQ.Agent(policy = 0.35, lr = 0.2, discount = 1)
-#print("Created Agent")
 agent.policy -= reduction
 y = []
 ts = time.time()
@@ -55,8 +58,6 @@ ax[1].grid()
 
 #-----------------------------------------------------------------------
 
-#agent = agentQ.Agent(policy = 0.20, lr = 0.2, discount = 1)
-#print("Created Agent")
 agent.policy -= reduction
 y = []
 ts = time.time()
@@ -78,8 +79,6 @@ ax[2].grid()
 
 #-----------------------------------------------------------------------
 
-#agent = agentQ.Agent(policy = 0.05, lr = 0.2, discount = 1)
-#print("Created Agent")
 agent.policy -= reduction
 y = []
 ts = time.time()

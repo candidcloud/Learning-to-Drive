@@ -1,11 +1,21 @@
-import tracker
+import tracker as imported_game
 import random
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 class Agent():
+    """
+    A class implementation of the Q-learning algorithm. This class first
+    creates a local instance of the imported game, sets defaults for the
+    Q-learning algorithm, and defines methods which act on the game instance.
+    The imported_game is assumed to have similar attributes and methods to the
+    gobble or tracker game.
+    """
     def __init__(self, Q = {}, policy = 0.25, lr = 0.5, discount = 0.2):
-        self.game = tracker.Game(10,3)
+        """
+        Initializes game and Q-learning attributes.
+        """
+        self.game = imported_game.Game(10,3)
         self.state = self.game.board
         self.actions = self.game.get_actions()
         self.policy = policy
@@ -15,6 +25,10 @@ class Agent():
         self.reward = 0
 
     def get_action(self):
+        """
+        Chooses an action from the game's get_actions() method using the
+        current Q-learning policy.
+        """
         actions = self.game.get_actions()
         if self.game.player_pos not in self.Q:
             self.Q[self.game.player_pos] = dict.fromkeys(actions,0)
@@ -32,6 +46,11 @@ class Agent():
         return choice
 
     def evolve(self, choice):
+        """
+        Updates the game and records the previous board position with the
+        previous score. Also runs a check_end() method on the game for
+        returning a boolean affirming or denying that the game has ended.
+        """
         old_pos = self.game.player_pos
         old_score = self.game.score
         self.game.update_board(choice)
@@ -39,6 +58,10 @@ class Agent():
         return old_pos, old_score, end
 
     def get_reward(self, old_score):
+        """
+        Allocate a reward to the agent based on the difference in current and
+        previous game scores. Returns the reward change for use in learning.
+        """
         R = self.game.score - old_score
         if R > 0:
             self.reward += R
@@ -48,6 +71,11 @@ class Agent():
         return R
 
     def learn(self, old_pos, R, choice):
+        """
+        Uses the Q-learning formula to update the Q-table for the last state
+        and action combination. Expects as input the reward returned from the
+        agent's get_reward() method.
+        """
         if self.game.player_pos in self.Q:
             self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R + self.discount*max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])[1]
         else:
@@ -59,7 +87,13 @@ class Agent():
                 self.Q[old_pos][key] = self.Q[old_pos][key]/normalizer
 
     def play(self,epochs):
+        """
+        Replays the local game instance for a given number of epochs. At the
+        end of each game, the cumulative score (not agent reward) is appended
+        to a list which is then returned after all epochs have been run.
+        """
         scores = []
+        self.reward = 0
         for i in tqdm(range(epochs)):
             end = False
             self.game.start_game()
@@ -73,10 +107,16 @@ class Agent():
         return scores
 
     def play_slow(self):
+        """
+        Plays one game from start to finish, plotting the board for each
+        move. Note that the agent does learn when this is run. Returns
+        the cumulative reward for the game.
+        """
         end = False
         plt.figure()
         plt.title("Tracker Game")
         self.game.start_game()
+        self.reward = 0
         while not end:
             self.game.show_board()
             plt.pause(0.05)
