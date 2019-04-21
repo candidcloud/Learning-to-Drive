@@ -4,9 +4,8 @@ import random
 
 plt.ion()
 
-def draw_board(grid_size, hole_pos):
-    board = np.ones((grid_size,grid_size))
-    board[hole_pos] = 0
+def draw_board():
+    board = np.genfromtxt('grid.csv',delimiter = ',')
     return board
 
 class Game():
@@ -15,19 +14,17 @@ class Game():
     and path_radius. There is an "example" method to illustrate how the
     game is played.
     """
-    def __init__(self, grid_size):
-        self.score = 0
-        self.grid_size = grid_size
+    def __init__(self):
         #self.player_pos = (np.random.randint(grid_size),np.random.randint(grid_size))
-        self.start_game(grid_size)
+        self.start_game()
         #self.show_board()
         plt.title("Nate's Lame Game")
 
-    def start_game(self, grid_size):
-        self.goal_pos = (0,0)
-        self.board = draw_board(grid_size, self.goal_pos)
-        self.player_pos = (5,5)
-        self.board[self.player_pos] = .5
+    def start_game(self):
+        self.score = 0
+        self.board = draw_board()
+        self.player_pos = tuple(map(int,np.where(self.board  == 3)))
+        self.goal_pos = tuple(map(int,np.where(np.isnan(self.board) == True)))
         
         # self.board[self.player_pos] = .5
 
@@ -39,18 +36,18 @@ class Game():
         #     self.score += 1
         # else:
         #     self.score -= 1
-        if np.sum(np.abs(np.array(new_pos) -  np.array(self.goal_pos))) == 0:
-            self.score  += 1
+        if np.sum(np.abs(np.array(new_pos) -  np.array(self.goal_pos))) == 1:
+            self.score += 100
 
         self.board[self.player_pos] = 1
-        self.board[new_pos] = .5
+        self.board[new_pos] = 3
         self.player_pos = new_pos
 
         if show_plt:
             self.show_board()
         if self.check_end():
             print('Game over yo')
-            self.start_game(self.grid_size)
+            self.start_game()
             return True
 
 
@@ -64,7 +61,7 @@ class Game():
         v_dim = self.board.shape[0]
         valid = []
         for a in actions:
-            if a[0] < v_dim and a[1] < v_dim and a[0] > -1 and a[1] > -1:
+            if a[0] < v_dim and a[1] < v_dim and a[0] > -1 and a[1] > -1 and self.board[a] != 2:
                 valid.append(a)
 
         return valid
@@ -73,6 +70,7 @@ class Game():
     def check_end(self):
         if self.player_pos == self.goal_pos:
             print('game is finished')
+            self.score = 0
             return True
         else:
             return False

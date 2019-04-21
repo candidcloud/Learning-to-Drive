@@ -7,7 +7,7 @@ plt.ion()
 
 class Agent():
     def __init__(self, Q = {}, policy = 0.5, lr = 0.5, discount = 0.2):
-        self.game = grid_world.Game(10)
+        self.game = grid_world.Game()
         self.state = self.game.board
         self.actions = self.game.get_actions()
         self.policy = policy
@@ -28,7 +28,7 @@ class Agent():
         coin_flip = np.random.rand()
         if self.policy < coin_flip and max_actions != []:
             choice = random.choice(max_actions)
-        elif other_actions != []: 
+        elif other_actions != []:
             choice = random.choice(other_actions)
         else:
             choice = random.choice(max_actions)
@@ -37,16 +37,21 @@ class Agent():
 
     def evolve(self, choice, show_plt=False):
         old_pos = self.game.player_pos
-        old_score = self.game.score
         end = self.game.update_board(choice, show_plt)
-        return old_pos, old_score, end
+        return old_pos, end
 
 
-    def get_reward(self, choice, old_pos):
-        if np.sum(np.abs(np.array(choice) -  np.array(self.game.goal_pos))) < np.sum(np.abs(np.array(old_pos) -  np.array(self.game.goal_pos))):
-            R = 1
+    def get_reward(self, choice):
+        if np.sum(np.abs(np.array(choice) -  np.array(self.game.goal_pos))) < np.sum(np.abs(np.array(self.game.player_pos) -  np.array(self.game.goal_pos))):
+            if np.sum(np.abs(np.array(choice) -  np.array(self.game.goal_pos))) ==1:
+                R = 100
+            else:
+                R = 1
+        # elif np.sum(np.abs(np.array(choice) -  np.array(self.game.goal_pos))) ==1:
+        #     R = 100
         else:
-            R = -2
+            R = -0.1
+            
         self.reward += R
         return R
 
@@ -63,8 +68,8 @@ class Agent():
             end = False
             while not end:
                 choice = self.get_action()
-                old_pos, old_score, end = self.evolve(choice)
-                R = self.get_reward(choice, old_pos)
+                old_pos, end = self.evolve(choice)
+                R = self.get_reward(choice)
                 self.learn(old_pos, R, choice)
             rewards.append(self.reward)
             self.reward = 0
@@ -76,8 +81,8 @@ class Agent():
         while not end:
             plt.pause(0.5)
             choice = self.get_action()
-            old_pos, old_score, end = self.evolve(choice, True)
-            R = self.get_reward(choice, old_pos)
+            old_pos, end = self.evolve(choice, True)
+            R = self.get_reward(choice)
             self.learn(old_pos, R, choice)
         R = self.reward
         self.reward = 0

@@ -7,10 +7,10 @@ print("Created Agent")
 y = []
 y.append(agent.play(1000))
 print("Finished Phase I...")
-agent.policy = 0.3
+agent.policy = .3
 y.append(agent.play(1000))
 print("Finished Phase II...")
-agent.policy = 0.4
+agent.policy = .2
 y.append(agent.play(1000))
 print("Finished Phase III...")
 
