@@ -3,12 +3,12 @@ A script for implementing Q-learning with agentQ.py and plotting the results
 of decreasing policy values over time.
 """
 
-import agentQ as Q00
+import agentQ
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-agent = Q00.Agent(policy = 0.45, lr = 0.2, discount = 0.2)
+agent = agentQ.Agent(policy = 0.45, lr = 0.2, discount = 0.2)
 print("Created Agent")
 y = []
 session_epochs = 500

@@ -1,4 +1,4 @@
-import tracker as imported_game
+import explorer as imported_game
 import random
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -9,7 +9,7 @@ class Agent():
     creates a local instance of the imported game, sets defaults for the
     Q-learning algorithm, and defines methods which act on the game instance.
     The imported_game is assumed to have similar attributes and methods to the
-    gobble or tracker game.
+    explorer game.
     """
     def __init__(self, Q = {}, policy = 0.25, lr = 0.5, discount = 0.2):
         """
@@ -35,13 +35,13 @@ class Agent():
 
         max_Q = max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])
         max_actions = [i[0] for i in self.Q[self.game.player_pos].items() if i[1]==max_Q[1]]
-        #other_actions = [i[0] for i in self.Q[self.game.player_pos].items() if i[1]!=max_Q[1]]
+        other_actions = [i[0] for i in self.Q[self.game.player_pos].items() if i[1]!=max_Q[1]]
 
         r = random.random()
-        if r > self.policy:  # choose optimally
+        if r > self.policy or other_actions==[]:  # choose optimally
             choice = random.choice(max_actions)
         else:
-            choice = random.choice(actions)
+            choice = random.choice(other_actions)
 
         return choice
 
@@ -78,22 +78,6 @@ class Agent():
         """
         if self.game.player_pos in self.Q:
             self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R + self.discount*max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])[1]
-        else:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R
-
-        normalizer = sum(self.Q[old_pos].values())
-        if normalizer > 1:
-            for key in self.Q[old_pos]:
-                self.Q[old_pos][key] = self.Q[old_pos][key]/normalizer
-
-    def learn(self, old_pos, R, choice):
-        """
-        Uses the Q-learning formula to update the Q-table for the last state
-        and action combination. Expects as input the reward returned from the
-        agent's get_reward() method.
-        """
-        if self.game.player_pos in self.Q:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*(R + self.discount*max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])[1])
         else:
             self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R
 

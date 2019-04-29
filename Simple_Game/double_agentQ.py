@@ -11,7 +11,7 @@ class Agent():
     The imported_game is assumed to have similar attributes and methods to the
     gobble or tracker game.
     """
-    def __init__(self, Q = {}, policy = 0.25, lr = 0.5, discount = 0.2):
+    def __init__(self, Q = [{},{}], policy = 0.25, lr = 0.5, discount = 0.2):
         """
         Initializes game and Q-learning attributes.
         """
@@ -30,11 +30,14 @@ class Agent():
         current Q-learning policy.
         """
         actions = self.game.get_actions()
-        if self.game.player_pos not in self.Q:
-            self.Q[self.game.player_pos] = dict.fromkeys(actions,0)
+        if self.game.player_pos not in self.Q[0]:
+            self.Q[0][self.game.player_pos] = dict.fromkeys(actions,0)
+        if self.game.player_pos not in self.Q[1]:
+            self.Q[1][self.game.player_pos] = dict.fromkeys(actions,0)
 
-        max_Q = max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])
-        max_actions = [i[0] for i in self.Q[self.game.player_pos].items() if i[1]==max_Q[1]]
+        avgQ = { k : (self.Q[0][self.game.player_pos][k] + self.Q[1][self.game.player_pos][k])/2 for k in self.Q[0][self.game.player_pos].keys() }
+        max_Q = max(avgQ.items(), key=lambda x:x[1])
+        max_actions = [i[0] for i in avgQ.items() if i[1]==max_Q[1]]
         #other_actions = [i[0] for i in self.Q[self.game.player_pos].items() if i[1]!=max_Q[1]]
 
         r = random.random()
@@ -70,37 +73,34 @@ class Agent():
             self.reward += R
         return R
 
-    def learn(self, old_pos, R, choice):
+    def double_learn(self, old_pos, R, choice):
+        """
+        Uses the double Q-learning formula to update the Q-tables for the last
+        state and action combination. Expects as input the reward returned
+        from the agent's get_reward() method.
+        """
+        if random.random() < 0.5:
+            self.updateQ(0, old_pos, R, choice)
+        else:
+            self.updateQ(1, old_pos, R, choice)
+
+    def updateQ(self, idx, old_pos, R, choice):
         """
         Uses the Q-learning formula to update the Q-table for the last state
         and action combination. Expects as input the reward returned from the
         agent's get_reward() method.
         """
-        if self.game.player_pos in self.Q:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R + self.discount*max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])[1]
+        other_idx = (idx + 1) % 2
+        if self.game.player_pos in self.Q[idx]:
+            self.Q[idx][old_pos][choice] = ( (1-self.lr)*self.Q[idx][old_pos][choice] + self.lr*(R
+                                            + self.discount*max(self.Q[other_idx][self.game.player_pos].items(), key=lambda x:x[1])[1]) )
         else:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R
+            self.Q[idx][old_pos][choice] = (1-self.lr)*self.Q[idx][old_pos][choice] + self.lr*R
 
-        normalizer = sum(self.Q[old_pos].values())
+        normalizer = sum(self.Q[idx][old_pos].values())
         if normalizer > 1:
-            for key in self.Q[old_pos]:
-                self.Q[old_pos][key] = self.Q[old_pos][key]/normalizer
-
-    def learn(self, old_pos, R, choice):
-        """
-        Uses the Q-learning formula to update the Q-table for the last state
-        and action combination. Expects as input the reward returned from the
-        agent's get_reward() method.
-        """
-        if self.game.player_pos in self.Q:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*(R + self.discount*max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])[1])
-        else:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R
-
-        normalizer = sum(self.Q[old_pos].values())
-        if normalizer > 1:
-            for key in self.Q[old_pos]:
-                self.Q[old_pos][key] = self.Q[old_pos][key]/normalizer
+            for key in self.Q[idx][old_pos]:
+                self.Q[idx][old_pos][key] = self.Q[idx][old_pos][key]/normalizer
 
     def play(self,epochs):
         """
@@ -117,7 +117,7 @@ class Agent():
                 choice = self.get_action()
                 old_pos, old_score, end = self.evolve(choice)
                 R = self.get_reward(old_score)
-                self.learn(old_pos, R, choice)
+                self.double_learn(old_pos, R, choice)
             scores.append(self.game.score)
             self.reward = 0
         return scores
@@ -139,7 +139,7 @@ class Agent():
             choice = self.get_action()
             old_pos, old_score, end = self.evolve(choice)
             R = self.get_reward(old_score)
-            self.learn(old_pos, R, choice)
+            self.double_learn(old_pos, R, choice)
         R = self.reward
         self.reward = 0
         return R
