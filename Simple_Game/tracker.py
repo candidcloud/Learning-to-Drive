@@ -46,6 +46,8 @@ class Game():
         Throws the current board to the active plot window.
         """
         plt.imshow(self.board)
+        plt.title('Tracker Game', fontsize=20)
+        plt.tick_params(labelsize=16);
         plt.show(block=False)
 
     def update_board(self, new_pos):

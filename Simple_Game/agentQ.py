@@ -62,29 +62,11 @@ class Agent():
         Allocate a reward to the agent based on the difference in current and
         previous game scores. Returns the reward change for use in learning.
         """
-        R = self.game.score - old_score
-        if R > 0:
-            self.reward += R
-        else:
-            R = 1/(1+abs(R))
-            self.reward += R
-        return R
-
-    def learn(self, old_pos, R, choice):
-        """
-        Uses the Q-learning formula to update the Q-table for the last state
-        and action combination. Expects as input the reward returned from the
-        agent's get_reward() method.
-        """
-        if self.game.player_pos in self.Q:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R + self.discount*max(self.Q[self.game.player_pos].items(), key=lambda x:x[1])[1]
-        else:
-            self.Q[old_pos][choice] = (1-self.lr)*self.Q[old_pos][choice] + self.lr*R
-
-        normalizer = sum(self.Q[old_pos].values())
-        if normalizer > 1:
-            for key in self.Q[old_pos]:
-                self.Q[old_pos][key] = self.Q[old_pos][key]/normalizer
+        reinforcement = self.game.score - old_score
+        #if reinforcement<5 and reinforcement>0:  # Avoid spoiling the agent with path rewards
+        #    reinforcement = 0
+        self.reward += reinforcement
+        return reinforcement
 
     def learn(self, old_pos, R, choice):
         """

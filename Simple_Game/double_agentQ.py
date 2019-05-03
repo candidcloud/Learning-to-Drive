@@ -65,13 +65,11 @@ class Agent():
         Allocate a reward to the agent based on the difference in current and
         previous game scores. Returns the reward change for use in learning.
         """
-        R = self.game.score - old_score
-        if R > 0:
-            self.reward += R
-        else:
-            R = 1/(1+abs(R))
-            self.reward += R
-        return R
+        reinforcement = self.game.score - old_score
+        #if reinforcement<5 and reinforcement>0:  # Avoid spoiling the agent with path rewards
+        #    reinforcement = 0
+        self.reward += reinforcement
+        return reinforcement
 
     def double_learn(self, old_pos, R, choice):
         """
