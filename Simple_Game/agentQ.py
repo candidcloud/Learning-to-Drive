@@ -1,6 +1,7 @@
 import tracker as imported_game
 import random
 import matplotlib.pyplot as plt
+from matplotlib.animation import FFMpegWriter
 from tqdm import tqdm
 
 class Agent():
@@ -110,18 +111,23 @@ class Agent():
         move. Note that the agent does learn when this is run. Returns
         the cumulative reward for the game.
         """
+        metadata = dict(title='Tracker Game', artist='Matplotlib',
+                comment='Example Play')
+        writer = FFMpegWriter(fps=5, metadata=metadata)
         end = False
-        plt.figure()
+        fig = plt.figure()
         plt.title("Tracker Game")
         self.game.start_game()
         self.reward = 0
-        while not end:
-            self.game.show_board()
-            plt.pause(0.05)
-            choice = self.get_action()
-            old_pos, old_score, end = self.evolve(choice)
-            R = self.get_reward(old_score)
-            self.learn(old_pos, R, choice)
+        with writer.saving(fig, "writer_test.mp4", 100):
+            while not end:
+                writer.grab_frame()
+                self.game.show_board()
+                plt.pause(0.05)
+                choice = self.get_action()
+                old_pos, old_score, end = self.evolve(choice)
+                R = self.get_reward(old_score)
+                self.learn(old_pos, R, choice)
         R = self.reward
         self.reward = 0
         return R

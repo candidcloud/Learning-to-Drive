@@ -19,7 +19,6 @@ y = []
 general = 25
 tiks = 22
 
-# Make plot of lines of best fit
 fig1,ax1 = plt.subplots(figsize=(15,12))
 
 for i in range(4):
@@ -46,7 +45,6 @@ ax1.legend(loc=4, fontsize=tiks)
 ax1.grid()
 plt.show(block=False)
 
-# Make plot of lines of best fit
 fig2,ax2 = plt.subplots(4, 1, figsize=(15,12), sharex=True)
 fig2.subplots_adjust(hspace=0.4)
 for i in range(4):
@@ -63,6 +61,7 @@ ax2[3].set_ylabel('Game Score', fontsize=general)
 ax2[3].tick_params(labelsize=tiks)
 plt.show(block=False)
 
+#----------------------------------------------------------------------
 
 # Discount rate training
 
@@ -75,7 +74,6 @@ y = []
 general = 25
 tiks = 22
 
-# Make plot of lines of best fit
 fig3,ax3 = plt.subplots(figsize=(15,12))
 
 for i in range(4):
@@ -102,7 +100,6 @@ ax3.legend(loc=4, fontsize=tiks)
 ax3.grid()
 plt.show(block=False)
 
-# Make plot of lines of best fit
 fig4,ax4 = plt.subplots(4, 1, figsize=(15,12), sharex=True)
 fig4.subplots_adjust(hspace=0.4)
 for i in range(4):
